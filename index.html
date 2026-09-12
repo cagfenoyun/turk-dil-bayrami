@@ -29,11 +29,11 @@
     font-family:'Nunito',sans-serif;
     color:var(--white);
     background:
-      radial-gradient(circle at 20% 8%, rgba(255,150,80,0.16), transparent 42%),
-      radial-gradient(circle at 82% 18%, rgba(227,10,23,0.32), transparent 46%),
-      radial-gradient(circle at 85% 88%, rgba(0,180,180,0.24), transparent 50%),
-      radial-gradient(circle at 10% 85%, rgba(242,183,5,0.10), transparent 45%),
-      linear-gradient(160deg, #5C1220 0%, #2C0710 55%, #1C040A 100%);
+      radial-gradient(circle at 20% 8%, rgba(255,170,110,0.28), transparent 46%),
+      radial-gradient(circle at 82% 14%, rgba(227,10,23,0.34), transparent 48%),
+      radial-gradient(circle at 85% 90%, rgba(0,196,196,0.30), transparent 52%),
+      radial-gradient(circle at 8% 88%, rgba(242,183,5,0.20), transparent 48%),
+      linear-gradient(160deg, #8A2130 0%, #5C1220 50%, #3A0B15 100%);
     overflow:auto;
     -webkit-user-select:none;
     user-select:none;
@@ -45,8 +45,8 @@
   }
   #bg-floaters .bg-floater{
     position:absolute;
-    opacity:0.16;
-    filter:drop-shadow(0 8px 18px rgba(0,0,0,0.45));
+    opacity:0.65;
+    filter:drop-shadow(0 10px 22px rgba(0,0,0,0.5));
     animation-name:floatDrift;
     animation-timing-function:ease-in-out;
     animation-iteration-count:infinite;
@@ -67,15 +67,17 @@
   }
   .burst-layer{ position:fixed; left:0; top:0; width:0; height:0; z-index:9999; pointer-events:none; }
   .burst-piece{
-    position:absolute; width:46px; height:46px; left:0; top:0;
+    position:absolute; width:64px; height:64px; left:0; top:0;
     transform:translate(-50%,-50%) scale(1) rotate(0deg);
     opacity:1;
-    animation:burstFly 0.9s cubic-bezier(.2,.75,.3,1) forwards;
-    filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+    animation:burstFly 1.8s cubic-bezier(.15,.7,.25,1) forwards;
+    filter:drop-shadow(0 8px 18px rgba(0,0,0,0.55));
   }
   @keyframes burstFly{
-    0%{ transform:translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; }
-    100%{ transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.35) rotate(var(--rot)); opacity:0; }
+    0%{ transform:translate(-50%,-50%) scale(0.6) rotate(0deg); opacity:1; }
+    12%{ transform:translate(-50%,-50%) scale(1.25) rotate(calc(var(--rot) * 0.08)); opacity:1; }
+    70%{ transform:translate(calc(-50% + var(--tx) * 0.9), calc(-50% + var(--ty) * 0.9)) scale(0.85) rotate(calc(var(--rot) * 0.85)); opacity:1; }
+    100%{ transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(var(--rot)); opacity:0; }
   }
 
   #topbar{
@@ -623,7 +625,7 @@ function initBackgroundFloaters() {
     img.src = LOGO_FILES[i % LOGO_FILES.length];
     img.alt = "";
     img.className = 'bg-floater';
-    const size = 36 + Math.random() * 46;
+    const size = 60 + Math.random() * 70;
     img.style.width = size + 'px';
     img.style.height = 'auto';
     img.style.left = (Math.random() * 94) + '%';
@@ -644,7 +646,7 @@ function scatterLogosFrom(originEl) {
   layer.className = 'burst-layer';
   document.body.appendChild(layer);
 
-  const pieceCount = 16;
+  const pieceCount = 22;
   for(let i = 0; i < pieceCount; i++) {
     const img = document.createElement('img');
     img.src = LOGO_FILES[i % LOGO_FILES.length];
@@ -654,21 +656,22 @@ function scatterLogosFrom(originEl) {
     img.style.top = originY + 'px';
 
     const angle = Math.random() * Math.PI * 2;
-    const dist = 160 + Math.random() * 260;
+    const dist = 260 + Math.random() * 380;
     const tx = Math.cos(angle) * dist;
     const ty = Math.sin(angle) * dist;
-    const rot = (Math.random() * 720 - 360);
+    const rot = (Math.random() * 1080 - 540);
 
     img.style.setProperty('--tx', tx + 'px');
     img.style.setProperty('--ty', ty + 'px');
     img.style.setProperty('--rot', rot + 'deg');
+    img.style.animationDelay = (Math.random() * 0.12) + 's';
 
     layer.appendChild(img);
   }
 
   setTimeout(function() {
     if(layer.parentNode) layer.parentNode.removeChild(layer);
-  }, 950);
+  }, 2000);
 }
 
 let serverTimeOffset = 0;
