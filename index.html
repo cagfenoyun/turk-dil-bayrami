@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Türk Dil Bayramı Bilgi Yarışması</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon-900:#3B0A10;
+    --maroon-800:#4E0E15;
+    --red:#E30A17;
+    --red-dark:#A80511;
+    --turquoise:#00B4B4;
+    --turquoise-dark:#007A7A;
+    --gold:#F2B705;
+    --white:#FFFFFF;
+    --gray-300:#E7C9C9;
+    --gray-500:#B98E8E;
+    --green:#2FAE60;
+    --red-wrong:#FF6B6B;
+    --shadow-strong: 0 18px 40px rgba(20,3,5,0.55);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    font-family:'Nunito',sans-serif;
+    color:var(--white);
+    background:
+      radial-gradient(circle at 15% 10%, rgba(227,10,23,0.28), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(0,180,180,0.22), transparent 48%),
+      linear-gradient(160deg, var(--maroon-900) 0%, #200409 100%);
+    overflow:auto;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+  #app{position:relative; width:100vw; min-height:100vh; display:flex; flex-direction:column;}
+
+  #topbar{
+    display:flex; align-items:center; gap:20px;
+    padding:20px 40px;
+    background:linear-gradient(180deg, rgba(59,10,16,0.9), rgba(59,10,16,0.0));
+    position:relative; z-index:20;
+    flex-shrink:0;
+  }
+  #topbar .brand-icon{
+    width:52px; height:52px; flex-shrink:0;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+  }
+  #topbar .brand-text{display:flex; flex-direction:column; line-height:1.05;}
+  #topbar .brand-text .club{
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px;
+    letter-spacing:0.3px; color:var(--white);
+  }
+  #topbar .brand-text .sub{
+    font-size:16px; color:var(--gray-300); font-weight:700;
+  }
+  #topbar .spacer{flex:1;}
+  #room-badge{
+    display:none;
+    align-items:center; gap:12px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    padding:12px 22px; border-radius:16px;
+    font-family:'Baloo 2',sans-serif; font-size:19px; font-weight:700;
+    color:var(--gray-300);
+    backdrop-filter:blur(6px);
+  }
+  #room-badge b{color:var(--gold); letter-spacing:4px; font-size:22px;}
+
+  .screen{
+    display:none; flex:1; min-height:0;
+    flex-direction:column; align-items:center; justify-content:center;
+    padding:20px 32px 36px;
+    position:relative;
+  }
+  .screen.active{display:flex;}
+
+  .card{
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.16);
+    border-top:6px solid var(--turquoise);
+    border-radius:28px;
+    box-shadow:var(--shadow-strong);
+    padding:52px 60px;
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+  }
+  h1.title{
+    font-family:'Baloo 2',sans-serif; font-weight:800;
+    font-size:clamp(38px,5vw,60px);
+    margin:0 0 10px;
+    text-align:center;
+  }
+  p.lead{
+    color:var(--gray-300); font-weight:700; text-align:center;
+    margin:0 0 36px; font-size:22px;
+  }
+
+  .btn{
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px;
+    border:none; border-radius:18px; cursor:pointer;
+    padding:20px 38px;
+    color:var(--white);
+    transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:active{transform:scale(0.96);}
+  .btn:disabled{opacity:0.45; cursor:not-allowed; filter:none;}
+  .btn-primary{
+    background:linear-gradient(180deg, var(--red), var(--red-dark));
+    box-shadow:0 10px 22px rgba(227,10,23,0.4);
+  }
+  .btn-primary:hover:not(:disabled){filter:brightness(1.1);}
+  .btn-block{width:100%;}
+
+  #screen-home .home-columns{
+    display:flex; align-items:stretch; gap:0; margin-top:10px;
+  }
+  .home-col{
+    flex:1; min-width:0;
+    display:flex; flex-direction:column; gap:22px;
+    padding:6px 28px;
+  }
+  .home-col-head{
+    display:flex; align-items:center; gap:18px;
+  }
+  .home-col-head .emoji{font-size:44px; flex-shrink:0;}
+  .home-col-head .ct{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:26px;}
+  .home-col-head .cs{color:var(--gray-300); font-size:16px; font-weight:600; margin-top:2px;}
+  .home-divider{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    flex-shrink:0; width:2px; align-self:stretch;
+    background:rgba(255,255,255,0.16);
+    position:relative;
+  }
+  .home-divider span{
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:var(--maroon-800);
+    color:var(--gray-300); font-weight:800; font-size:15px;
+    letter-spacing:1px; text-transform:uppercase;
+    padding:10px 6px; border-radius:10px;
+    border:1px solid rgba(255,255,255,0.16);
+  }
+
+  .form-panel{width:100%; display:flex; flex-direction:column; gap:18px;}
+  .field label{display:block; font-size:16px; font-weight:800; color:var(--gray-300); margin-bottom:8px; letter-spacing:0.3px;}
+  .field input{
+    width:100%; padding:18px 20px; border-radius:14px; border:2px solid rgba(255,255,255,0.18);
+    background:rgba(20,4,7,0.4); color:var(--white); font-size:23px; font-weight:700;
+    font-family:'Nunito',sans-serif;
+  }
+  .field input:focus{outline:none; border-color:var(--turquoise);}
+  .field input.code-input{letter-spacing:14px; text-align:center; font-family:'Baloo 2',sans-serif; font-size:34px;}
+  .error-msg{
+    color:#FFE1E1; background:rgba(255,107,107,0.22); border:1px solid rgba(255,107,107,0.5);
+    padding:14px 18px; border-radius:12px; font-weight:700; font-size:18px; display:none;
+  }
+
+  @media (max-width:860px){
+    #screen-home .home-columns{flex-direction:column;}
+    .home-divider{width:auto; height:2px; align-self:stretch; margin:8px 0;}
+    .home-divider span{left:50%; top:50%; transform:translate(-50%,-50%);}
+  }
+
+  #screen-lobby .lobby-code{
+    text-align:center; margin-bottom:28px;
+  }
+  #screen-lobby .lobby-code .cap{font-size:16px; letter-spacing:2px; color:var(--gray-300); font-weight:800;}
+  #screen-lobby .lobby-code .val{
+    font-family:'Baloo 2',sans-serif; font-size:76px; font-weight:800; color:var(--gold);
+    letter-spacing:20px; margin-top:4px;
+  }
+  .lobby-count{text-align:center; color:var(--gray-300); font-weight:800; font-size:17px; margin-bottom:20px; letter-spacing:0.5px;}
+  .lobby-teams-wrap{
+    display:flex; flex-wrap:wrap; gap:18px; justify-content:center;
+    max-width:820px; margin-bottom:10px;
+  }
+  .team-slot{
+    width:210px; min-height:150px; border-radius:20px; padding:20px 16px;
+    background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.14);
+    text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+  }
+  .team-slot.me{border-color:var(--turquoise);}
+  .team-slot .tname{font-family:'Baloo 2',sans-serif; font-size:22px; font-weight:700; word-break:break-word;}
+  .team-slot .tstatus{font-size:15px; font-weight:800; padding:7px 16px; border-radius:20px;}
+  .tstatus.waiting{background:rgba(185,142,142,0.25); color:var(--gray-300);}
+  .tstatus.ready{background:rgba(47,174,96,0.22); color:#7CE3A6;}
+  .host-tag{font-size:14px; color:var(--gold); font-weight:800;}
+  .lobby-empty-hint{
+    color:var(--gray-500); font-weight:700; font-size:18px; text-align:center;
+    padding:26px; border:2px dashed rgba(255,255,255,0.16); border-radius:18px; width:100%; max-width:500px;
+  }
+  #lobby-ready-btn, #lobby-start-btn{margin-top:14px;}
+  .countdown-overlay{
+    position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    background:rgba(20,4,7,0.78); z-index:30; flex-direction:column; gap:8px;
+    border-radius:28px;
+  }
+  .countdown-overlay.active{display:flex;}
+  .countdown-num{
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:200px; color:var(--red);
+    text-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+  .countdown-label{font-weight:800; color:var(--gray-300); letter-spacing:3px; font-size:24px;}
+
+  #screen-game{padding:18px 36px 30px; justify-content:flex-start;}
+  .game-shell{
+    width:100%; max-width:1500px; margin:0 auto;
+    display:flex; flex-direction:column; gap:22px; height:100%; min-height:0;
+  }
+  .meta-row{display:flex; align-items:center; justify-content:space-between; padding:0 8px; gap:20px;}
+  .q-progress{font-weight:800; color:var(--gray-300); font-size:22px; white-space:nowrap;}
+  .q-category{
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px;
+    background:rgba(0,180,180,0.2); color:#8BF0F0; padding:10px 26px; border-radius:26px;
+    border:1px solid rgba(0,180,180,0.45); white-space:nowrap;
+  }
+  .timer-wrap{position:relative; width:104px; height:104px; flex-shrink:0;}
+  .timer-wrap svg{transform:rotate(-90deg); width:104px; height:104px;}
+  .timer-wrap .ring-bg{fill:none; stroke:rgba(255,255,255,0.14); stroke-width:8;}
+  .timer-wrap .ring-fg{fill:none; stroke:var(--gold); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .1s linear, stroke .2s ease;}
+  .timer-wrap .ring-fg.warn{stroke:var(--red-wrong);}
+  .timer-wrap .tnum{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:34px;
+  }
+
+  .scoreboard-strip{display:flex; flex-wrap:wrap; gap:16px; justify-content:center; padding:2px 6px;}
+  .score-chip{
+    position:relative;
+    display:flex; align-items:center; gap:16px;
+    background:rgba(255,255,255,0.07);
+    border:2px solid rgba(255,255,255,0.16);
+    border-radius:18px; padding:14px 26px;
+    transition:transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
+  }
+  .score-chip.mine{border-color:var(--turquoise); background:rgba(0,180,180,0.16);}
+  .score-chip .sc-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; color:var(--gray-300); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .score-chip.mine .sc-name{color:var(--white);}
+  .score-chip .sc-score{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px; color:var(--gold);}
+
+  @keyframes score-chip-bump{
+    0%{ transform:scale(1); box-shadow:none; }
+    35%{ transform:scale(1.12); box-shadow:0 0 0 6px rgba(47,174,96,0.35), 0 12px 26px rgba(47,174,96,0.35); border-color:var(--green); }
+    100%{ transform:scale(1); box-shadow:none; }
+  }
+  .score-chip.score-bump{ animation:score-chip-bump 0.9s ease; }
+
+  .score-pop{
+    position:absolute; top:-14px; right:10px;
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:24px;
+    color:#7CE3A6;
+    text-shadow:0 4px 12px rgba(0,0,0,0.5);
+    pointer-events:none;
+    animation:score-pop-float 1.1s ease forwards;
+  }
+  @keyframes score-pop-float{
+    0%{ opacity:0; transform:translateY(6px) scale(0.7); }
+    25%{ opacity:1; transform:translateY(-10px) scale(1.15); }
+    100%{ opacity:0; transform:translateY(-42px) scale(1); }
+  }
+
+  .question-card{
+    flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:26px; padding:50px 60px;
+    backdrop-filter:blur(10px);
+  }
+  .q-text{
+    font-family:'Baloo 2',sans-serif; font-weight:700;
+    font-size:clamp(30px,3.4vw,48px); text-align:center; line-height:1.3;
+    margin-bottom:44px;
+  }
+  .options-grid{display:grid; grid-template-columns:1fr 1fr; gap:30px; flex:1; min-height:0;}
+  .opt-btn{
+    display:flex; align-items:center; gap:22px;
+    background:rgba(255,255,255,0.07);
+    border:2px solid rgba(255,255,255,0.18);
+    border-radius:22px; padding:34px 34px; cursor:pointer;
+    text-align:left; transition:.12s ease;
+  }
+  .opt-btn:nth-child(1){border-color:rgba(227,10,23,0.4);}
+  .opt-btn:nth-child(2){border-color:rgba(0,180,180,0.4);}
+  .opt-btn:hover:not(:disabled){filter:brightness(1.15); transform:translateY(-2px);}
+  .opt-btn:disabled{cursor:default;}
+  .opt-badge{
+    flex-shrink:0; width:60px; height:60px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px;
+  }
+  .opt-btn:nth-child(1) .opt-badge{background:var(--red);}
+  .opt-btn:nth-child(2) .opt-badge{background:var(--turquoise-dark);}
+  .opt-text{font-size:27px; font-weight:700; color:var(--white); line-height:1.25;}
+
+  @keyframes correct-blink{
+    0%, 100%{ background:rgba(47,174,96,0.16); border-color:var(--green); }
+    50%{ background:rgba(47,174,96,0.55); border-color:#7CE3A6; }
+  }
+  .opt-btn.correct-flash{
+    animation: correct-blink 0.6s ease-in-out 3;
+    border-color:var(--green) !important;
+    background:rgba(47,174,96,0.35);
+  }
+  .opt-btn.correct-flash .opt-badge{background:var(--green) !important; color:var(--white);}
+  .opt-btn.wrong-pick{
+    border-color:var(--red-wrong) !important;
+    background:rgba(255,107,107,0.28);
+  }
+  .opt-btn.wrong-pick .opt-badge{background:var(--red-wrong) !important; color:var(--white);}
+
+  .status-line{
+    text-align:center; margin-top:24px; font-weight:800; color:var(--gray-300); font-size:20px; min-height:26px;
+  }
+
+  #screen-result .result-trophy{font-size:110px; margin-bottom:10px;}
+  .result-list{display:flex; flex-direction:column; gap:14px; margin:26px auto 10px; max-width:600px; width:100%;}
+  .result-row{
+    display:flex; align-items:center; gap:16px;
+    background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.14);
+    border-radius:18px; padding:18px 26px;
+  }
+  .result-row.top{border-color:var(--gold); background:rgba(242,183,5,0.14);}
+  .rr-rank{font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--gray-300); width:36px; flex-shrink:0; font-size:22px;}
+  .rr-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px; flex:1; text-align:left; word-break:break-word;}
+  .rr-score{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px; color:var(--gold); flex-shrink:0;}
+
+  @media (max-width:900px){
+    .options-grid{grid-template-columns:1fr;}
+    .score-chip .sc-name{max-width:90px;}
+  }
+
+  #screen-intro{
+    background:transparent;
+    flex-direction:column; gap:22px;
+    overflow:hidden;
+  }
+  .intro-welcome{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:26px; padding:0 20px; width:100%;
+  }
+  .intro-icon{
+    font-size:clamp(48px,6vw,80px);
+    opacity:0;
+    animation:introFadeIn 0.6s ease 0.1s forwards, introFadeOut 0.6s ease 4.2s forwards;
+  }
+  .intro-title{
+    font-family:'Baloo 2',sans-serif; font-weight:800;
+    font-size:clamp(42px,7vw,92px);
+    line-height:1.15;
+    margin:0;
+    letter-spacing:1px;
+    background:linear-gradient(90deg, var(--red) 0%, var(--gold) 35%, var(--turquoise) 65%, var(--red) 100%);
+    background-size:300% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:
+      introRainbow 4s linear infinite,
+      introPopIn 0.7s cubic-bezier(.34,1.56,.64,1) both,
+      introFadeOut 0.6s ease 4.2s forwards;
+    text-shadow:0 14px 40px rgba(0,0,0,0.35);
+  }
+  @keyframes introRainbow{
+    0%{ background-position:0% 50%; }
+    100%{ background-position:300% 50%; }
+  }
+  @keyframes introPopIn{
+    0%{ opacity:0; transform:scale(0.6) translateY(20px); }
+    60%{ opacity:1; transform:scale(1.08) translateY(0); }
+    100%{ opacity:1; transform:scale(1) translateY(0); }
+  }
+  @keyframes introFadeOut{
+    from{ opacity:1; transform:scale(1); }
+    to{ opacity:0; transform:scale(0.94); }
+  }
+  .intro-sub{
+    font-weight:800; font-size:clamp(19px,2.2vw,30px); color:var(--gray-300);
+    letter-spacing:1px;
+    opacity:0;
+    animation:
+      introFadeIn 0.6s ease 0.5s forwards,
+      introFadeOut 0.6s ease 4.2s forwards;
+    text-align:center;
+    max-width:820px;
+  }
+  @keyframes introFadeIn{
+    from{ opacity:0; transform:translateY(8px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="topbar">
+    <svg class="brand-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="30" fill="#E30A17"/>
+      <path d="M40 12a20 20 0 1 0 0 40 20 20 0 0 1 0-40z" fill="#FFFFFF"/>
+      <path d="M42 22l2.4 6.6 7 .3-5.6 4.3 2 6.7-5.8-4-5.8 4 2-6.7-5.6-4.3 7-.3z" fill="#E30A17"/>
+    </svg>
+    <div class="brand-text">
+      <span class="club">Türk Dil Bayramı</span>
+      <span class="sub">Bilgi Yarışması</span>
+    </div>
+    <div class="spacer"></div>
+    <div id="room-badge">ODA KODU <b id="room-badge-code">----</b></div>
+  </div>
+
+  <div class="screen active" id="screen-intro">
+    <div class="intro-welcome">
+      <div class="intro-icon">🌙⭐</div>
+      <h1 class="intro-title">TÜRK DİL BAYRAMI<br>BİLGİ YARIŞMASI</h1>
+      <div class="intro-sub">Dilimiz, Kimliğimizdir! Türk Dil Bayramı Kutlu Olsun.</div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-home">
+    <div class="card home-card" style="max-width:1150px; width:100%;">
+      <h1 class="title">Hazır mısınız? 🇹🇷</h1>
+      <p class="lead">Sınıfını seç, kodu paylaş, aynı kodu girenler odaya katılsın! (2-6 sınıf)</p>
+
+      <div class="home-columns">
+        <div class="home-col">
+          <div class="home-col-head">
+            <span class="emoji">🛡️</span>
+            <div>
+              <div class="ct">Oda Oluştur</div>
+              <div class="cs">Yeni bir yarışma başlat</div>
+            </div>
+          </div>
+          <div class="form-panel" id="panel-create">
+            <div class="field">
+              <label>Sınıfınızın adı</label>
+              <input type="text" id="create-name" maxlength="24" placeholder="Örn: 5-A Sınıfı">
+            </div>
+            <div class="error-msg" id="create-error"></div>
+            <button class="btn btn-primary btn-block" id="create-submit">Oda Oluştur</button>
+          </div>
+        </div>
+
+        <div class="home-divider"><span>veya</span></div>
+
+        <div class="home-col">
+          <div class="home-col-head">
+            <span class="emoji">🔑</span>
+            <div>
+              <div class="ct">Odaya Katıl</div>
+              <div class="cs">4 haneli kodla katıl</div>
+            </div>
+          </div>
+          <div class="form-panel" id="panel-join">
+            <div class="field">
+              <label>Oda kodu</label>
+              <input type="text" id="join-code" class="code-input" maxlength="4" placeholder="0000" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label>Sınıfınızın adı</label>
+              <input type="text" id="join-name" maxlength="24" placeholder="Örn: 5-B Sınıfı">
+            </div>
+            <div class="error-msg" id="join-error"></div>
+            <button class="btn btn-primary btn-block" id="join-submit">Odaya Katıl</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-lobby">
+    <div class="card" style="max-width:720px; width:100%; position:relative;">
+      <div class="lobby-code">
+        <div class="cap">ODA KODU — Bu kodu tüm katılacak sınıflara söyleyin</div>
+        <div class="val" id="lobby-code-val">----</div>
+      </div>
+      <div class="lobby-count" id="lobby-count">0/6 sınıf katıldı</div>
+      <div class="lobby-teams-wrap" id="lobby-teams-wrap"></div>
+      <div style="text-align:center;">
+        <button class="btn btn-primary" id="lobby-ready-btn">Hazırız! ✅</button>
+        <button class="btn btn-primary" id="lobby-start-btn" style="display:none;">Yarışmayı Başlat 🚀</button>
+        <div class="status-line" id="lobby-hint">Diğer sınıfların kod ile katılmasını bekleyin.</div>
+      </div>
+
+      <div class="countdown-overlay" id="countdown-overlay">
+        <div class="countdown-num" id="countdown-num">3</div>
+        <div class="countdown-label">YARIŞMA BAŞLIYOR</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-game">
+    <div class="game-shell">
+      <div class="meta-row">
+        <div class="q-progress" id="q-progress">Soru 1/39</div>
+        <div class="q-category">Türk Dili</div>
+        <div class="timer-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle class="ring-bg" cx="32" cy="32" r="27"></circle>
+            <circle class="ring-fg" id="ring-fg" cx="32" cy="32" r="27"></circle>
+          </svg>
+          <div class="tnum" id="timer-num">45</div>
+        </div>
+      </div>
+
+      <div class="scoreboard-strip" id="scoreboard-strip"></div>
+
+      <div class="question-card" id="question-card">
+        <div class="q-text" id="q-text">Soru yükleniyor...</div>
+        <div class="options-grid" id="options-grid"></div>
+        <div class="status-line" id="game-status-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-result">
+    <div class="card" style="max-width:600px; width:100%; text-align:center;">
+      <div class="result-trophy">🏆</div>
+      <h1 class="title" id="result-headline">Tebrikler!</h1>
+      <div class="result-list" id="result-list"></div>
+      <p class="lead" style="margin-top:8px;">Dilimiz, Kimliğimizdir! Harika bir yarışmaydı!</p>
+      <button class="btn btn-primary" id="result-newgame">Yeni Oyun</button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getDatabase, ref, set, get, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAsfRreanfJ-YpT0OV0QX4gIlJ3riI72rQ",
+  authDomain: "turk-dil-bayrami-e3502.firebaseapp.com",
+  projectId: "turk-dil-bayrami-e3502",
+  storageBucket: "turk-dil-bayrami-e3502.firebasestorage.app",
+  messagingSenderId: "566542680634",
+  appId: "1:566542680634:web:ef46576fadf5da81b72b03"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let serverTimeOffset = 0;
+onValue(ref(db, ".info/serverTimeOffset"), function(snap) {
+  serverTimeOffset = snap.val() || 0;
+});
+function getServerNow() {
+  return Date.now() + serverTimeOffset;
+}
+
+const QUESTION_BANK = [
+  { question: "Karamanoğlu Mehmet Bey kimdir?", optionA: "Karamanoğulları Beyliği hükümdarlarından biridir.", optionB: "Osmanlı Devleti’nin ilk padişahıdır.", answer: "A" },
+  { question: "Karamanoğlu Mehmet Bey, Türk tarihi açısından neden önemlidir?", optionA: "Türkçenin devlet dili olarak kullanılmasını savunduğu için", optionB: "İlk Türkçe romanı yazdığı için", answer: "A" },
+  { question: "Yunus Emre kimdir?", optionA: "Türkçe şiirleriyle tanınan önemli bir Türk mutasavvıfı ve şairidir.", optionB: "Karamanoğulları Beyliği’nin hükümdarıdır.", answer: "A" },
+  { question: "Karamanoğlu Mehmet Bey ile Yunus Emre’nin ortak özelliği nedir?", optionA: "Türkçenin gelişmesine ve değer kazanmasına katkı sağlamaları", optionB: "Türkçenin yerine yabancı dillerin kullanılmasını savunmaları", answer: "A" },
+  { question: "“Online” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Çevrim içi", optionB: "Çevrim dışı", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Herkez", optionB: "Herkes", answer: "B" },
+  { question: "“Start” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Başlangıç", optionB: "Bitiş", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Birşey", optionB: "Bir şey", answer: "B" },
+  { question: "“Weekend” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Hafta sonu", optionB: "Hafta içi", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Yanlız", optionB: "Yalnız", answer: "B" },
+  { question: "“Meeting” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Toplantı", optionB: "Yarışma", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Şöför", optionB: "Şoför", answer: "B" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Antarktika", optionB: "Antartika", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Hiçbir", optionB: "Hiç bir", answer: "A" },
+  { question: "“Feedback” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Geri bildirim", optionB: "Ön bilgi", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Birçok", optionB: "Bir çok", answer: "A" },
+  { question: "“Trend” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Eğilim", optionB: "Gelenek", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Pekçok", optionB: "Pek çok", answer: "B" },
+  { question: "“Update” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Güncelleme", optionB: "Silme", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Art arda", optionB: "Ard arda", answer: "A" },
+  { question: "“Workshop” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Atölye", optionB: "Sergi", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Olağanüstü", optionB: "Olağan üstü", answer: "A" },
+  { question: "“Design” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Tasarım", optionB: "Boyama", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Bir kaç", optionB: "Birkaç", answer: "B" },
+  { question: "“Download” kelimesinin Türkçe karşılığı hangisidir?", optionA: "İndirme", optionB: "Gönderme", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Herhangi bir", optionB: "Her hangi bir", answer: "A" },
+  { question: "“Challenge” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Meydan okuma", optionB: "Dinlenme", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Gitgide", optionB: "Git gide", answer: "A" },
+  { question: "“Deadline” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Son teslim tarihi", optionB: "Başlangıç tarihi", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Yanı sıra", optionB: "Yanısıra", answer: "A" },
+  { question: "“Option” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Seçenek", optionB: "Zorunluluk", answer: "A" },
+  { question: "Hangisinin yazımı doğrudur?", optionA: "Bir takım sorunlar", optionB: "Birtakım sorunlar", answer: "B" },
+  { question: "“Global” kelimesinin Türkçe karşılığı hangisidir?", optionA: "Küresel", optionB: "Yerel", answer: "A" },
+  { question: "Aşağıdakilerden hangisinin yazımı doğrudur?", optionA: "Birden bire", optionB: "Birdenbire", answer: "B" },
+  { question: "Aşağıdaki cümlelerin hangisinde “ki”nin yazımı doğrudur?", optionA: "Öyle güzel konuştu ki herkes onu dikkatle dinledi.", optionB: "Öyle güzel konuştuki herkes onu dikkatle dinledi.", answer: "A" },
+  { question: "Aşağıdakilerden hangisinin yazımı doğrudur?", optionA: "Mademki", optionB: "Madem ki", answer: "A" },
+  { question: "“Selfie” kelimesi yerine Türkçede hangi sözcük kullanılabilir?", optionA: "Özçekim", optionB: "Öz görüntü", answer: "A" },
+  { question: "Aşağıdakilerden hangisinin yazımı doğrudur?", optionA: "Baş başa", optionB: "Başbaşa", answer: "A" },
+  { question: "🏆 FİNAL: Aşağıdaki cümlelerin hangisinde yazım yanlışı vardır?", optionA: "Bu kitabı okuduğumda, konunun sandığımdan daha ilginç olduğunu fark ettim.", optionB: "Bu kitabı okuduğumda, konunun sandığımdan daha ilginç olduğunu farkettim.", answer: "B" }
+];
+
+const MIN_TEAMS = 2;
+const MAX_TEAMS = 6;
+const QUESTION_TIME = 45;
+
+let currentRoomCode = null;
+let myTeamId = null;
+let myTeamName = "";
+let timerInterval = null;
+let isAnsweredCurrentQ = false;
+let currentTeamIds = [];
+
+function roomRef(path) {
+  return ref(db, 'rooms/' + currentRoomCode + (path ? '/' + path : ''));
+}
+
+const screens = {
+  intro: document.getElementById('screen-intro'),
+  home: document.getElementById('screen-home'),
+  lobby: document.getElementById('screen-lobby'),
+  game: document.getElementById('screen-game'),
+  result: document.getElementById('screen-result')
+};
+
+function showScreen(screenName) {
+  Object.keys(screens).forEach(s => screens[s].classList.remove('active'));
+  screens[screenName].classList.add('active');
+}
+
+setTimeout(function() {
+  showScreen('home');
+}, 4800);
+
+document.getElementById('create-submit').addEventListener('click', async function() {
+  const nameInput = document.getElementById('create-name').value.trim();
+  const errDiv = document.getElementById('create-error');
+  if(!nameInput) {
+    errDiv.textContent = "Lütfen bir sınıf adı girin.";
+    errDiv.style.display = "block";
+    return;
+  }
+
+  myTeamName = nameInput;
+  currentRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+  const newTeamRef = push(ref(db, 'rooms/' + currentRoomCode + '/teams'));
+  myTeamId = newTeamRef.key;
+
+  const initialData = {
+    code: currentRoomCode,
+    status: 'lobby',
+    hostId: myTeamId,
+    maxTeams: MAX_TEAMS,
+    teams: {},
+    currentQ: 0,
+    qStartTime: 0
+  };
+  initialData.teams[myTeamId] = { name: myTeamName, ready: false, score: 0, answer: "" };
+
+  await set(roomRef(), initialData);
+  setupLobbyListeners();
+  enterLobby();
+});
+
+document.getElementById('join-submit').addEventListener('click', async function() {
+  const codeInput = document.getElementById('join-code').value.trim();
+  const nameInput = document.getElementById('join-name').value.trim();
+  const errDiv = document.getElementById('join-error');
+
+  if(codeInput.length !== 4 || !nameInput) {
+    errDiv.textContent = "Lütfen 4 haneli kod ve sınıf adını eksiksiz girin.";
+    errDiv.style.display = "block";
+    return;
+  }
+
+  currentRoomCode = codeInput;
+  const snap = await get(roomRef());
+
+  if(!snap.exists()) {
+    errDiv.textContent = "Oda bulunamadı! Kodu kontrol edin.";
+    errDiv.style.display = "block";
+    return;
+  }
+
+  const roomData = snap.val();
+  if(roomData.status !== 'lobby') {
+    errDiv.textContent = "Yarışma zaten başladı, bu odaya katılamazsınız.";
+    errDiv.style.display = "block";
+    return;
+  }
+
+  const existingCount = roomData.teams ? Object.keys(roomData.teams).length : 0;
+  const cap = roomData.maxTeams || MAX_TEAMS;
+  if(existingCount >= cap) {
+    errDiv.textContent = "Oda dolu! (En fazla " + cap + " sınıf katılabilir)";
+    errDiv.style.display = "block";
+    return;
+  }
+
+  myTeamName = nameInput;
+  const newTeamRef = push(ref(db, 'rooms/' + currentRoomCode + '/teams'));
+  myTeamId = newTeamRef.key;
+
+  await set(newTeamRef, {
+    name: myTeamName,
+    ready: false,
+    score: 0,
+    answer: ""
+  });
+
+  setupLobbyListeners();
+  enterLobby();
+});
+
+function enterLobby() {
+  showScreen('lobby');
+  document.getElementById('room-badge').style.display = 'flex';
+  document.getElementById('room-badge-code').textContent = currentRoomCode;
+  document.getElementById('lobby-code-val').textContent = currentRoomCode;
+}
+
+function renderLobbyTeams(data) {
+  const wrap = document.getElementById('lobby-teams-wrap');
+  wrap.innerHTML = '';
+  const teams = data.teams || {};
+  const ids = Object.keys(teams);
+  const cap = data.maxTeams || MAX_TEAMS;
+
+  document.getElementById('lobby-count').textContent = ids.length + '/' + cap + ' sınıf katıldı';
+
+  if(ids.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'lobby-empty-hint';
+    empty.textContent = 'Henüz kimse katılmadı.';
+    wrap.appendChild(empty);
+    return;
+  }
+
+  ids.forEach(function(id) {
+    const t = teams[id];
+    const slot = document.createElement('div');
+    slot.className = 'team-slot' + (id === myTeamId ? ' me' : '');
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'tname';
+    nameDiv.textContent = t.name;
+    slot.appendChild(nameDiv);
+
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'tstatus ' + (t.ready ? 'ready' : 'waiting');
+    statusDiv.textContent = t.ready ? 'HAZIR' : 'Bekleniyor';
+    slot.appendChild(statusDiv);
+
+    if(id === data.hostId) {
+      const hostTag = document.createElement('div');
+      hostTag.className = 'host-tag';
+      hostTag.textContent = '👑 Kurucu';
+      slot.appendChild(hostTag);
+    }
+
+    wrap.appendChild(slot);
+  });
+}
+
+function setupLobbyListeners() {
+  onValue(roomRef(), function(snap) {
+    const data = snap.val();
+    if(!data) return;
+
+    renderLobbyTeams(data);
+
+    const teams = data.teams || {};
+    const ids = Object.keys(teams);
+    const amIHost = (myTeamId === data.hostId);
+    const allReady = ids.length > 0 && ids.every(function(id) { return teams[id].ready; });
+
+    const startBtn = document.getElementById('lobby-start-btn');
+    const readyBtn = document.getElementById('lobby-ready-btn');
+    const hint = document.getElementById('lobby-hint');
+
+    if(amIHost) {
+      startBtn.style.display = 'inline-block';
+      const canStart = ids.length >= MIN_TEAMS && allReady && data.status === 'lobby';
+      startBtn.disabled = !canStart;
+      if(data.status === 'lobby') {
+        if(ids.length < MIN_TEAMS) {
+          hint.textContent = 'Başlamak için en az ' + MIN_TEAMS + ' sınıf gerekiyor.';
+        } else if(!allReady) {
+          hint.textContent = 'Tüm sınıfların hazır olmasını bekleyin.';
+        } else {
+          hint.textContent = 'Hazırsınız! İstediğiniz zaman başlatabilirsiniz.';
+        }
+      }
+    } else {
+      startBtn.style.display = 'none';
+    }
+
+    if(teams[myTeamId] && teams[myTeamId].ready) {
+      readyBtn.disabled = true;
+    }
+
+    if(data.status === 'starting') {
+      startCountdown();
+    }
+
+    if(data.status === 'playing' && screens.lobby.classList.contains('active')) {
+      startGameScreen();
+    }
+  });
+}
+
+document.getElementById('lobby-ready-btn').addEventListener('click', function() {
+  update(roomRef('teams/' + myTeamId), { ready: true });
+  document.getElementById('lobby-ready-btn').disabled = true;
+});
+
+document.getElementById('lobby-start-btn').addEventListener('click', function() {
+  update(roomRef(), { status: 'starting' });
+  startCountdown();
+});
+
+let countdownStarted = false;
+function startCountdown() {
+  if(countdownStarted) return;
+  countdownStarted = true;
+  const overlay = document.getElementById('countdown-overlay');
+  const numDiv = document.getElementById('countdown-num');
+  overlay.classList.add('active');
+
+  let count = 3;
+  numDiv.textContent = count;
+
+  const cdInterval = setInterval(function() {
+    count--;
+    if(count > 0) {
+      numDiv.textContent = count;
+    } else {
+      clearInterval(cdInterval);
+      get(roomRef()).then(function(snap) {
+        const data = snap.val();
+        if(data && data.hostId === myTeamId) {
+          update(roomRef(), {
+            status: 'playing',
+            currentQ: 0,
+            qStartTime: serverTimestamp()
+          });
+        }
+      });
+    }
+  }, 1000);
+}
+
+function startGameScreen() {
+  showScreen('game');
+  setupGameListeners();
+}
+
+let prevScores = {};
+let scoresInitialized = false;
+
+function renderScoreboard(data) {
+  const strip = document.getElementById('scoreboard-strip');
+  strip.innerHTML = '';
+  const teams = data.teams || {};
+  const arr = Object.keys(teams).map(function(id) {
+    return { id: id, name: teams[id].name, score: teams[id].score };
+  });
+  arr.sort(function(a, b) { return b.score - a.score; });
+
+  if(!scoresInitialized) {
+    arr.forEach(function(t) { prevScores[t.id] = t.score; });
+    scoresInitialized = true;
+  }
+
+  arr.forEach(function(t) {
+    const chip = document.createElement('div');
+    chip.className = 'score-chip' + (t.id === myTeamId ? ' mine' : '');
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'sc-name';
+    nameSpan.textContent = t.name;
+
+    const scoreSpan = document.createElement('span');
+    scoreSpan.className = 'sc-score';
+    scoreSpan.textContent = t.score;
+
+    chip.appendChild(nameSpan);
+    chip.appendChild(scoreSpan);
+
+    const prev = (typeof prevScores[t.id] === 'number') ? prevScores[t.id] : t.score;
+    const diff = t.score - prev;
+    if(diff > 0) {
+      const pop = document.createElement('div');
+      pop.className = 'score-pop';
+      pop.textContent = '+' + diff;
+      chip.appendChild(pop);
+
+      chip.classList.add('score-bump');
+      setTimeout(function() { chip.classList.remove('score-bump'); }, 900);
+      setTimeout(function() { if(pop.parentNode) pop.parentNode.removeChild(pop); }, 1100);
+    }
+    prevScores[t.id] = t.score;
+
+    strip.appendChild(chip);
+  });
+}
+
+function setupGameListeners() {
+  onValue(roomRef(), function(snap) {
+    const data = snap.val();
+    if(!data || data.status !== 'playing') {
+      if(data && data.status === 'finished') {
+        showResults(data);
+      }
+      return;
+    }
+
+    currentTeamIds = Object.keys(data.teams || {});
+    renderScoreboard(data);
+
+    const qIndex = data.currentQ;
+    if(qIndex >= QUESTION_BANK.length) {
+      if(data.hostId === myTeamId) update(roomRef(), { status: 'finished' });
+      return;
+    }
+
+    renderQuestion(qIndex, data);
+  });
+}
+
+let activeQIndex = -1;
+
+function renderQuestion(qIndex, data) {
+  const question = QUESTION_BANK[qIndex];
+
+  if(activeQIndex !== qIndex) {
+    activeQIndex = qIndex;
+    isAnsweredCurrentQ = false;
+
+    document.getElementById('q-progress').textContent = "Soru " + (qIndex + 1) + "/" + QUESTION_BANK.length;
+    document.getElementById('q-text').textContent = question.question;
+    document.getElementById('game-status-line').textContent = "";
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = "";
+
+    const opts = [
+      { letter: "A", text: question.optionA },
+      { letter: "B", text: question.optionB }
+    ];
+    opts.forEach(function(opt) {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.dataset.letter = opt.letter;
+      btn.innerHTML = '<div class="opt-badge">' + opt.letter + '</div><div class="opt-text">' + opt.text + '</div>';
+      btn.addEventListener('click', function() { sendAnswer(opt.letter, question.answer); });
+      grid.appendChild(btn);
+    });
+
+    startTimer(data.qStartTime);
+  }
+
+  const myData = data.teams[myTeamId];
+
+  if(myData.answer && myData.answer !== "" && !isAnsweredCurrentQ) {
+    isAnsweredCurrentQ = true;
+    showAnswerFeedback(myData.answer, question.answer);
+  }
+
+  const allAnswered = currentTeamIds.every(function(id) { return data.teams[id].answer && data.teams[id].answer !== ""; });
+  if(allAnswered) {
+    if(data.hostId === myTeamId) {
+      setTimeout(function() { advanceToNextQuestion(qIndex); }, 1500);
+    }
+  }
+}
+
+function startTimer(qStartTime) {
+  clearInterval(timerInterval);
+  const timerNum = document.getElementById('timer-num');
+  const ringFg = document.getElementById('ring-fg');
+  const strokeDashMax = 170;
+
+  timerInterval = setInterval(function() {
+    const elapsed = Math.floor((getServerNow() - qStartTime) / 1000);
+    const remaining = Math.max(0, QUESTION_TIME - elapsed);
+
+    timerNum.textContent = remaining;
+
+    const offset = strokeDashMax - (remaining / QUESTION_TIME) * strokeDashMax;
+    ringFg.style.strokeDasharray = strokeDashMax;
+    ringFg.style.strokeDashoffset = offset;
+
+    if(remaining <= 5) {
+      ringFg.classList.add('warn');
+    } else {
+      ringFg.classList.remove('warn');
+    }
+
+    if(remaining <= 0) {
+      clearInterval(timerInterval);
+      disableOptions();
+      get(roomRef()).then(function(snap) {
+        const data = snap.val();
+        if(data && data.hostId === myTeamId) {
+          advanceToNextQuestion(activeQIndex);
+        }
+      });
+    }
+  }, 200);
+}
+
+function sendAnswer(pickedLetter, correctLetter) {
+  if(isAnsweredCurrentQ) return;
+  isAnsweredCurrentQ = true;
+
+  showAnswerFeedback(pickedLetter, correctLetter);
+
+  const isCorrect = (pickedLetter === correctLetter);
+
+  get(roomRef('teams/' + myTeamId)).then(function(snap) {
+    const val = snap.val();
+    const currentScore = (val && val.score) || 0;
+    const newScore = isCorrect ? currentScore + 10 : currentScore;
+
+    update(roomRef('teams/' + myTeamId), {
+      answer: pickedLetter,
+      score: newScore
+    });
+  });
+
+  document.getElementById('game-status-line').textContent = "Cevabınız iletildi, diğer sınıflar/süre bekleniyor...";
+}
+
+function showAnswerFeedback(pickedLetter, correctLetter) {
+  disableOptions();
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(function(b) {
+    if(b.dataset.letter === correctLetter) {
+      b.classList.add('correct-flash');
+    }
+    if(b.dataset.letter === pickedLetter && pickedLetter !== correctLetter) {
+      b.classList.add('wrong-pick');
+    }
+  });
+}
+
+function disableOptions() {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(function(b) { b.disabled = true; });
+}
+
+function advanceToNextQuestion(currentQIndex) {
+  const updates = {
+    currentQ: currentQIndex + 1,
+    qStartTime: serverTimestamp()
+  };
+  currentTeamIds.forEach(function(id) {
+    updates['teams/' + id + '/answer'] = "";
+  });
+  update(roomRef(), updates);
+}
+
+function showResults(data) {
+  clearInterval(timerInterval);
+  showScreen('result');
+
+  const teams = data.teams || {};
+  const arr = Object.keys(teams).map(function(id) {
+    return { name: teams[id].name, score: teams[id].score };
+  });
+  arr.sort(function(a, b) { return b.score - a.score; });
+
+  const list = document.getElementById('result-list');
+  list.innerHTML = '';
+  const maxScore = arr.length ? arr[0].score : 0;
+
+  arr.forEach(function(t, idx) {
+    const row = document.createElement('div');
+    row.className = 'result-row' + (t.score === maxScore ? ' top' : '');
+
+    const rank = document.createElement('span');
+    rank.className = 'rr-rank';
+    rank.textContent = (idx + 1) + '.';
+
+    const name = document.createElement('span');
+    name.className = 'rr-name';
+    name.textContent = t.name;
+
+    const score = document.createElement('span');
+    score.className = 'rr-score';
+    score.textContent = t.score;
+
+    row.appendChild(rank);
+    row.appendChild(name);
+    row.appendChild(score);
+    list.appendChild(row);
+  });
+
+  const winners = arr.filter(function(t) { return t.score === maxScore; });
+  const headline = document.getElementById('result-headline');
+
+  if(winners.length === arr.length && arr.length > 1) {
+    headline.textContent = "Dostluk Kazandı! Herkes Berabere! 🤝";
+  } else if(winners.length === 1) {
+    headline.textContent = winners[0].name + " Kazandı! 🎉";
+  } else {
+    headline.textContent = winners.map(function(w) { return w.name; }).join(' ve ') + " Berabere Kazandı! 🎉";
+  }
+}
+
+document.getElementById('result-newgame').addEventListener('click', function() {
+  window.location.reload();
+});
+</script>
+</body>
+</html>
