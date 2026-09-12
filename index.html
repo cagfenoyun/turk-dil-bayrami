@@ -231,6 +231,45 @@
   .tstatus.waiting{background:rgba(185,142,142,0.25); color:var(--gray-300);}
   .tstatus.ready{background:rgba(47,174,96,0.22); color:#7CE3A6;}
   .host-tag{font-size:14px; color:var(--gold); font-weight:800;}
+
+  .edit-name-btn{
+    background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.28);
+    border-radius:10px; width:32px; height:32px; cursor:pointer;
+    color:var(--white); font-size:15px; display:inline-flex; align-items:center; justify-content:center;
+    padding:0; flex-shrink:0; transition:filter .12s ease;
+  }
+  .edit-name-btn:hover{filter:brightness(1.25);}
+  .edit-name-btn.small{width:26px; height:26px; font-size:12px;}
+  .tname-row{display:flex; align-items:center; gap:8px; justify-content:center;}
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,2,4,0.62); z-index:600;
+    display:none; align-items:center; justify-content:center; padding:20px;
+    backdrop-filter:blur(4px);
+  }
+  .modal-overlay.active{display:flex;}
+  .modal-box{
+    width:min(92vw,420px);
+    background:rgba(50,12,20,0.92);
+    border:1px solid rgba(255,255,255,0.18);
+    border-top:5px solid var(--turquoise);
+    border-radius:22px;
+    box-shadow:var(--shadow-strong);
+    padding:30px 30px 26px;
+    display:flex; flex-direction:column; gap:18px;
+    backdrop-filter:blur(18px);
+  }
+  .modal-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px; text-align:center;}
+  #name-edit-input{
+    width:100%; padding:16px 18px; border-radius:12px; border:2px solid rgba(255,255,255,0.2);
+    background:rgba(20,4,7,0.5); color:var(--white); font-size:20px; font-weight:700;
+    font-family:'Nunito',sans-serif;
+  }
+  #name-edit-input:focus{outline:none; border-color:var(--turquoise);}
+  .modal-actions{display:flex; gap:12px;}
+  .modal-actions .btn{flex:1; font-size:20px; padding:14px 20px;}
+  .btn-secondary{background:rgba(255,255,255,0.12); box-shadow:none;}
+  .btn-secondary:hover:not(:disabled){filter:brightness(1.2);}
   .lobby-empty-hint{
     color:var(--gray-500); font-weight:700; font-size:18px; text-align:center;
     padding:26px; border:2px dashed rgba(255,255,255,0.16); border-radius:18px; width:100%; max-width:500px;
@@ -598,6 +637,17 @@
 
 </div>
 
+<div class="modal-overlay" id="name-edit-overlay">
+  <div class="modal-box">
+    <div class="modal-title">Sınıf adını düzenle</div>
+    <input type="text" id="name-edit-input" maxlength="24">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="name-edit-cancel">Vazgeç</button>
+      <button class="btn btn-primary" id="name-edit-save">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getDatabase, ref, set, get, push, onValue, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
@@ -672,6 +722,43 @@ function scatterLogosFrom(originEl) {
   setTimeout(function() {
     if(layer.parentNode) layer.parentNode.removeChild(layer);
   }, 2000);
+}
+
+let audioCtx = null;
+function getAudioCtx() {
+  if(!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(audioCtx.state === 'suspended') { audioCtx.resume(); }
+  return audioCtx;
+}
+function playTone(freq, duration, type, startDelay, gainPeak) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    const t0 = ctx.currentTime + (startDelay || 0);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(gainPeak || 0.3, t0 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + duration + 0.05);
+  } catch(e) { /* audio not available, ignore */ }
+}
+function playCorrectSound() {
+  playTone(880, 0.15, 'sine', 0, 0.28);
+  playTone(1318.5, 0.22, 'sine', 0.11, 0.26);
+}
+function playWrongSound() {
+  playTone(190, 0.3, 'sawtooth', 0, 0.22);
+  playTone(140, 0.34, 'sawtooth', 0.06, 0.18);
+}
+function playVictorySound() {
+  const notes = [523.25, 659.25, 783.99, 1046.5];
+  notes.forEach(function(f, i) { playTone(f, 0.24, 'triangle', i * 0.15, 0.22); });
 }
 
 let serverTimeOffset = 0;
@@ -837,6 +924,34 @@ document.getElementById('join-submit').addEventListener('click', async function(
   enterLobby();
 });
 
+function openNameEditModal(currentName) {
+  const overlay = document.getElementById('name-edit-overlay');
+  const input = document.getElementById('name-edit-input');
+  input.value = currentName || '';
+  overlay.classList.add('active');
+  setTimeout(function() { input.focus(); input.select(); }, 50);
+}
+function closeNameEditModal() {
+  document.getElementById('name-edit-overlay').classList.remove('active');
+}
+function saveNameEdit() {
+  const input = document.getElementById('name-edit-input');
+  const val = input.value.trim();
+  if(!val || !myTeamId) { closeNameEditModal(); return; }
+  myTeamName = val;
+  update(roomRef('teams/' + myTeamId), { name: val });
+  closeNameEditModal();
+}
+document.getElementById('name-edit-cancel').addEventListener('click', closeNameEditModal);
+document.getElementById('name-edit-save').addEventListener('click', saveNameEdit);
+document.getElementById('name-edit-input').addEventListener('keydown', function(e) {
+  if(e.key === 'Enter') { saveNameEdit(); }
+  if(e.key === 'Escape') { closeNameEditModal(); }
+});
+document.getElementById('name-edit-overlay').addEventListener('click', function(e) {
+  if(e.target === this) { closeNameEditModal(); }
+});
+
 function enterLobby() {
   showScreen('lobby');
   document.getElementById('room-badge').style.display = 'flex';
@@ -866,10 +981,28 @@ function renderLobbyTeams(data) {
     const slot = document.createElement('div');
     slot.className = 'team-slot' + (id === myTeamId ? ' me' : '');
 
+    const nameRow = document.createElement('div');
+    nameRow.className = 'tname-row';
+
     const nameDiv = document.createElement('div');
     nameDiv.className = 'tname';
     nameDiv.textContent = t.name;
-    slot.appendChild(nameDiv);
+    nameRow.appendChild(nameDiv);
+
+    if(id === myTeamId) {
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'edit-name-btn';
+      editBtn.innerHTML = '✏️';
+      editBtn.title = 'Sınıf adını düzenle';
+      editBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openNameEditModal(t.name);
+      });
+      nameRow.appendChild(editBtn);
+    }
+
+    slot.appendChild(nameRow);
 
     const statusDiv = document.createElement('div');
     statusDiv.className = 'tstatus ' + (t.ready ? 'ready' : 'waiting');
@@ -1010,6 +1143,20 @@ function renderScoreboard(data) {
     scoreSpan.textContent = t.score;
 
     chip.appendChild(nameSpan);
+
+    if(t.id === myTeamId) {
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'edit-name-btn small';
+      editBtn.innerHTML = '✏️';
+      editBtn.title = 'Sınıf adını düzenle';
+      editBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openNameEditModal(t.name);
+      });
+      chip.appendChild(editBtn);
+    }
+
     chip.appendChild(scoreSpan);
 
     const prev = (typeof prevScores[t.id] === 'number') ? prevScores[t.id] : t.score;
@@ -1163,6 +1310,11 @@ function sendAnswer(pickedLetter, correctLetter) {
 
 function showAnswerFeedback(pickedLetter, correctLetter) {
   disableOptions();
+  if(pickedLetter === correctLetter) {
+    playCorrectSound();
+  } else {
+    playWrongSound();
+  }
   const btns = document.querySelectorAll('.opt-btn');
   btns.forEach(function(b) {
     if(b.dataset.letter === correctLetter) {
@@ -1190,9 +1342,14 @@ function advanceToNextQuestion(currentQIndex) {
   update(roomRef(), updates);
 }
 
+let resultSoundPlayed = false;
 function showResults(data) {
   clearInterval(timerInterval);
   showScreen('result');
+  if(!resultSoundPlayed) {
+    resultSoundPlayed = true;
+    playVictorySound();
+  }
 
   const teams = data.teams || {};
   const arr = Object.keys(teams).map(function(id) {
