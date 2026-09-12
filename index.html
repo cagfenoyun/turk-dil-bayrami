@@ -748,13 +748,34 @@ function playTone(freq, duration, type, startDelay, gainPeak) {
     osc.stop(t0 + duration + 0.05);
   } catch(e) { /* audio not available, ignore */ }
 }
+function playSlide(startFreq, endFreq, duration, startDelay, gainPeak) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    const t0 = ctx.currentTime + (startDelay || 0);
+    osc.frequency.setValueAtTime(startFreq, t0);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, t0 + duration);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(gainPeak || 0.24, t0 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + duration + 0.05);
+  } catch(e) { /* audio not available, ignore */ }
+}
 function playCorrectSound() {
-  playTone(880, 0.15, 'sine', 0, 0.28);
-  playTone(1318.5, 0.22, 'sine', 0.11, 0.26);
+  const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+  const times = [0, 0.07, 0.14, 0.21, 0.30];
+  notes.forEach(function(freq, i) {
+    playTone(freq, 0.24, 'triangle', times[i], 0.26);
+    playTone(freq * 2, 0.14, 'sine', times[i], 0.09);
+  });
 }
 function playWrongSound() {
-  playTone(190, 0.3, 'sawtooth', 0, 0.22);
-  playTone(140, 0.34, 'sawtooth', 0.06, 0.18);
+  playSlide(380, 160, 0.32, 0, 0.24);
+  playSlide(320, 130, 0.36, 0.24, 0.2);
 }
 function playVictorySound() {
   const notes = [523.25, 659.25, 783.99, 1046.5];
