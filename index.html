@@ -575,7 +575,7 @@
   <div class="screen" id="screen-home">
     <div class="card home-card" style="max-width:1150px; width:100%;">
       <h1 class="title">Hazır mısınız? 🇹🇷</h1>
-      <p class="lead">Sınıfını seç, kodu paylaş, aynı kodu girenler odaya katılsın! (2-6 sınıf)</p>
+      <p class="lead">Sınıfını seç, kodu paylaş, aynı kodu girenler odaya katılsın!</p>
 
       <div class="home-columns">
         <div class="home-col">
@@ -629,7 +629,7 @@
         <div class="cap">ODA KODU — Bu kodu tüm katılacak sınıflara söyleyin</div>
         <div class="val" id="lobby-code-val">----</div>
       </div>
-      <div class="lobby-count" id="lobby-count">0/6 sınıf katıldı</div>
+      <div class="lobby-count" id="lobby-count">0 sınıf katıldı</div>
       <div class="lobby-teams-wrap" id="lobby-teams-wrap"></div>
       <div style="text-align:center;">
         <button class="btn btn-primary" id="lobby-ready-btn">Hazırız! ✅</button>
@@ -878,7 +878,6 @@ const QUESTION_BANK = [
 ];
 
 const MIN_TEAMS = 2;
-const MAX_TEAMS = 6;
 const QUESTION_TIME = 45;
 
 let currentRoomCode = null;
@@ -928,7 +927,6 @@ document.getElementById('create-submit').addEventListener('click', async functio
     code: currentRoomCode,
     status: 'lobby',
     hostId: myTeamId,
-    maxTeams: MAX_TEAMS,
     teams: {},
     currentQ: 0,
     qStartTime: 0
@@ -963,14 +961,6 @@ document.getElementById('join-submit').addEventListener('click', async function(
   const roomData = snap.val();
   if(roomData.status !== 'lobby') {
     errDiv.textContent = "Yarışma zaten başladı, bu odaya katılamazsınız.";
-    errDiv.style.display = "block";
-    return;
-  }
-
-  const existingCount = roomData.teams ? Object.keys(roomData.teams).length : 0;
-  const cap = roomData.maxTeams || MAX_TEAMS;
-  if(existingCount >= cap) {
-    errDiv.textContent = "Oda dolu! (En fazla " + cap + " sınıf katılabilir)";
     errDiv.style.display = "block";
     return;
   }
@@ -1030,9 +1020,8 @@ function renderLobbyTeams(data) {
   wrap.innerHTML = '';
   const teams = data.teams || {};
   const ids = Object.keys(teams);
-  const cap = data.maxTeams || MAX_TEAMS;
 
-  document.getElementById('lobby-count').textContent = ids.length + '/' + cap + ' sınıf katıldı';
+  document.getElementById('lobby-count').textContent = ids.length + ' sınıf katıldı';
 
   if(ids.length === 0) {
     const empty = document.createElement('div');
